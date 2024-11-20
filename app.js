@@ -30,20 +30,26 @@ app.use(cors({
 // if adding static do it after logger !
 app.use(logger("dev"));
 
+// ℹ️ This function is getting exported from the config folder. It runs most pieces of middleware
+require("./config")(app);
+
+// 👇 Start handling routes here
+
 app.get("/", (req, res, next) => {
     console.log(req);
     res.send("<h1>Welcome</h1>");
 })
 
-// ℹ️ This function is getting exported from the config folder. It runs most pieces of middleware
-require("./config")(app);
 
-// 👇 Start handling routes here
 const indexRoutes = require("./routes/index.routes");
 app.use("/api", indexRoutes);
 
 const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
+
+
+app.use("/api", require("./routes/exercises.routes"));
+app.use("/api", require("./routes/plans.routes"));
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);

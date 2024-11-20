@@ -21,7 +21,7 @@ router.get("/plans", (req, res, next) => {
         })
 });
 
-router.get("/plans/:planId", (req, res, next) => {
+router.get("/plans/:planId", isAuthenticated, (req, res, next) => {
     const {planId} = req.params;
 
     if(!mongoose.Types.ObjectId.isValid(planId)) {
@@ -40,7 +40,7 @@ router.get("/plans/:planId", (req, res, next) => {
         })
 });
 
-router.post("/plans", (req, res, next) => {
+router.post("/plans", isAuthenticated, (req, res, next) => {
     const {name, description, category, length, exercises} = req.body;
 console.log(req.body)
     Plans.create({name, description, category, length, exercises})
@@ -53,7 +53,7 @@ console.log(req.body)
         })
 });
 
-router.delete("/plans/:planId", (req, res, next) => {
+router.delete("/plans/:planId", isAuthenticated, (req, res, next) => {
     const {planId} = req.params;
 
     if(!mongoose.Types.ObjectId.isValid(planId)) {
@@ -71,7 +71,7 @@ router.delete("/plans/:planId", (req, res, next) => {
         })
 });
 
-router.patch("/plans/:planId", async (req, res, next) => {
+router.patch("/plans/:planId", isAuthenticated, async (req, res, next) => {
     const {planId} = req.params;
 
     try{

@@ -17,7 +17,7 @@ router.get("/exercises", (req, res, next) => {
         })
 });
 
-router.get("/exercises/:exerciseId", (req, res, next) => {
+router.get("/exercises/:exerciseId", isAuthenticated, (req, res, next) => {
     const {exerciseId} = req.params;
 
     Exercise.findById(exerciseId)
@@ -30,7 +30,7 @@ router.get("/exercises/:exerciseId", (req, res, next) => {
         })
 })
 
-router.post("/exercises", (req, res, next) => {
+router.post("/exercises", isAuthenticated, (req, res, next) => {
     const {name, description, category, difficulty} = req.body;
 
     Exercise.create({name, description, category, difficulty})
@@ -40,6 +40,32 @@ router.post("/exercises", (req, res, next) => {
         .catch((error) => {
             console.log("error while creating the exercise", error);
             res.status(500).json({error: "error while creating the exercise"});
+        })
+});
+
+router.patch("/exercises/:exerciseId", isAuthenticated, (req, res, next) => {
+    const {exerciseId} = req.params;
+
+    Exercise.findByIdAndUpdate(exerciseId, req.body, {new: true, runValidators: true})
+        .then((updatedExercise) => {
+            res.status(201).json(updatedExercise)
+        })
+        .catch((error) => {
+            console.log("unable to update exercise", error);
+            res.status(500).json({error: "unable to update exercise"})
+        })
+});
+
+router.delete("/exercises/:exerciseId", isAuthenticated, (req, res, next) => {
+    const {exerciseId} = req.params;
+
+    Exercise.findByIdAndDelete(exerciseId)
+        .then(() => {
+            res.status(201).json({message: "The exercise has been deleted"})
+        })
+        .catch((error) => {
+            console.log("error deleting exercise", error);
+            res.status(500).json({error: "error deleting exercise"})
         })
 })
 

@@ -44,11 +44,17 @@ router.post("/signup", (req, res, next) => {
       return User.create({ email, password: hashedPassword, name });
     })
     .then((createdUser) => {
+      console.log(createdUser);
       const { email, name, _id } = createdUser;
 
-      const user = { email, name, _id };
+      const payload = { _id, email, name };
 
-      res.status(201).json({ user: user });
+      const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+        algorithm: "HS256",
+        expiresIn: "6h",
+      });
+
+      res.status(201).json({ authToken });
     })
     .catch((err) => next(err));
 });

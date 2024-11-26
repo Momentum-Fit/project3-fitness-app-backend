@@ -23,11 +23,13 @@ mongoose
   )
   .catch((err) => console.error("error connecting to Mongo", err));
 
-app.use(
-  cors({
-    origin: ["http://localhost:5173"],
-  })
-);
+  app.use(cors({
+    origin: "http://localhost:5173",  
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"], 
+    credentials: true,
+  }));
+  
 
 // if adding static do it after logger !
 app.use(logger("dev"));

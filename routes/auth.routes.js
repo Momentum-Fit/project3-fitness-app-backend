@@ -7,6 +7,7 @@ const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
 
 const saltRounds = 10;
+const fileUploader = require('../config/cloudinary.config')
 
 router.post("/signup", (req, res, next) => {
   const { email, password, name } = req.body;
@@ -30,6 +31,7 @@ router.post("/signup", (req, res, next) => {
     });
     return;
   }
+
 
   User.findOne({ email })
     .then((foundUser) => {
@@ -93,6 +95,14 @@ router.post("/login", (req, res, next) => {
     })
     .catch((err) => next(err));
 });
+
+router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
+  if(!req.file) {
+    next(new Error("No file uploaded"));
+    return
+  }
+  res.json({fileUrl: req.file.path});
+})
 
 router.get("/verify", isAuthenticated, (req, res, next) => {
   console.log(`req.payload`, req.payload);

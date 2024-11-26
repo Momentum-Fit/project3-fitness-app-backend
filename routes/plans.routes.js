@@ -13,7 +13,7 @@ router.get("/plans", (req, res, next) => {
     .populate("exercises")
         .then((plans) => {
             console.log("retrieved plans: ", plans);
-            res.status(201).json(plans);
+            res.json(plans);
         })
         .catch((error) => {
             console.log("error while retreaving plans", error);
@@ -32,7 +32,7 @@ router.get("/plans/:planId", isAuthenticated, (req, res, next) => {
     Plan.findById(planId)
         .populate("exercises")
         .then((plan) => {
-            res.status(201).json(plan)
+            res.json(plan)
         })
         .catch((error) => {
             console.log(`error retrieving the plan with Id ${planId}`, error);
@@ -42,10 +42,15 @@ router.get("/plans/:planId", isAuthenticated, (req, res, next) => {
 
 router.post("/plans", isAuthenticated, (req, res, next) => {
     const {name, description, category, length, exercises} = req.body;
-console.log(req.body)
-    Plans.create({name, description, category, length, exercises})
+
+    const formattedExercises = exercises.map((exercise) => ({
+        exerciseId: new mongoose.Types.ObjectId(exercise.exerciseId),
+        repetitions: exercise.repetitions,
+      }));
+
+    Plans.create({name, description, category, length, exercises: formattedExercises})
         .then((response) => {
-            res.json(response)
+            res.status(201).json(response)
         })
         .catch((error) => {
             console.log("error while creating plan", error);
@@ -100,7 +105,7 @@ router.patch("/plans/:planId", isAuthenticated, async (req, res, next) => {
             runValidators: true,
         });
 
-        return res.status(201).json(updated);
+        return res.status(200).json(updated);
         } catch(error) {
             console.log(error, "unable to update plan");
             return res.status(500).json({message: "unable to update plan"})

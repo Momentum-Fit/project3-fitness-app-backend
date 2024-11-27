@@ -44,9 +44,11 @@ router.post("/plans", isAuthenticated, (req, res, next) => {
     const {name, description, category, length, exercises} = req.body;
 
     const formattedExercises = exercises.map((exercise) => ({
-        exerciseId: new mongoose.Types.ObjectId(exercise.exerciseId),
+        exerciseId: mongoose.Types.ObjectId.isValid(exercise.exerciseId) 
+            ? exercise.exerciseId 
+            : new mongoose.Types.ObjectId(),
         repetitions: exercise.repetitions,
-      }));
+    }));
 
     Plans.create({name, description, category, length, exercises: formattedExercises})
         .then((response) => {

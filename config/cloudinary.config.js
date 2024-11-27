@@ -11,7 +11,7 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
     cloudinary,
-    folder: 'UserPictures', 
+    folder: 'Home', 
     allowedFormats: ['jpg', 'png'],
     
     filename: function (req, res, cb) {

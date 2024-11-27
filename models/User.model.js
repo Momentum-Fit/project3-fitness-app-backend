@@ -19,8 +19,14 @@ const userSchema = new Schema(
       required: [true, "Name is required."],
     },
 
-    imageUrl: {
-      type: String,
+    imageUrl: { type: String },
+    height: { type: String },
+    weight: { type: String },
+    about: { type: String },
+    goals: {
+      weightloss: { type: Boolean, default: false },
+      muscleGain: { type: Boolean, default: false },
+      endurance: { type: Boolean, default: false },
     }
   },
   {

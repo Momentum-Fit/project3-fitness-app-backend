@@ -7,7 +7,8 @@ const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
 
 const saltRounds = 10;
-const fileUploader = require('../config/cloudinary.config')
+const fileUploader = require('../config/cloudinary.config');
+const { expressjwt } = require("express-jwt");
 
 router.post("/signup", (req, res, next) => {
   const { email, password, name } = req.body;
@@ -101,12 +102,78 @@ router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
     next(new Error("No file uploaded"));
     return
   }
-  res.json({fileUrl: req.file.path});
-})
+  res.status(200).json({fileUrl: req.file.path});
+});
+
+router.put("/users/:userId", isAuthenticated, (req, res, next) => {
+  const { userId } =req.params;
+  const { updatedData } = req.body;
+
+  if(req.payload._id !== userId) {
+    return res.status(403).json({message: "Unauthorized to update this profile."})
+  } 
+
+  User.findByIdAndUpdate(userId, updatedData, { new: true })
+    .then((updatedUser) => {
+      if(!updatedUser) {
+        return res.status(404).json({message: "User not found"})
+      }
+      res.status(200).json(updatedUser);
+    })
+    .catch((err) => {
+      console.error("error updating user", err)
+      res.status(500).json({message: "error updating user profile"})
+    });
+});
 
 router.get("/verify", isAuthenticated, (req, res, next) => {
-  console.log(`req.payload`, req.payload);
-  res.status(200).json(req.payload);
+  try {
+    res.status(200).json(req.payload); 
+  } catch (err) {
+    console.error("Error in /auth/verify:", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
+
+router.get("users/:userId", isAuthenticated, (req, res, next) => {
+  const { userId } = req.params;
+
+  if(req.payload._id !== userId) {
+    return res.status(403).json({message: "Unauthorized"})
+  }
+
+  User.findById(userId)
+    .then(user => {
+      if(!user) {
+        return res.status(404).json({message: "User not found"})
+      }
+      res.status(200).json(user);
+    })
+    .catch (err => {
+      console.log("error fetching user", err)
+      res.status(500).json({message: "error fetching user profile"})
+    })
+});
+
+router.get("/me", isAuthenticated, (req, res, next) => {
+  
+  const userId = req.payload._id;
+  if (!userId) {
+    return res.status(400).json({ message: "Invalid or missing user ID" });
+  }
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json(user); 
+    })
+    .catch((err) => {
+      console.error("Error fetching user:", err);
+      res.status(500).json({ message: "Internal server error" });
+    });
+});
+
 
 module.exports = router;

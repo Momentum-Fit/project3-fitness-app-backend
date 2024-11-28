@@ -12,7 +12,6 @@ router.get("/plans", (req, res, next) => {
     Plans.find({})
     .populate("exercises")
         .then((plans) => {
-            console.log("retrieved plans: ", plans);
             res.json(plans);
         })
         .catch((error) => {

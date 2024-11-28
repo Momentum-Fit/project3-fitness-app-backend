@@ -105,16 +105,16 @@ router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
   res.status(200).json({fileUrl: req.file.path});
 });
 
-router.put("/users/:userId", isAuthenticated, (req, res, next) => {
-  const { userId } =req.params;
-  const { updatedData } = req.body;
+router.put("/users", isAuthenticated, (req, res, next) => {
+  // req.payload._id
 
-  if(req.payload._id !== userId) {
-    return res.status(403).json({message: "Unauthorized to update this profile."})
-  } 
+  // const { updatedData } = req.body;
 
-  User.findByIdAndUpdate(userId, updatedData, { new: true })
+console.log("id", req.payload._id)
+console.log("body", req.body)
+  User.findByIdAndUpdate(req.payload._id, req.body, { new: true })
     .then((updatedUser) => {
+      console.log("updatedUser",updatedUser)
       if(!updatedUser) {
         return res.status(404).json({message: "User not found"})
       }
@@ -126,9 +126,10 @@ router.put("/users/:userId", isAuthenticated, (req, res, next) => {
     });
 });
 
-router.get("/verify", isAuthenticated, (req, res, next) => {
+router.get("/verify", isAuthenticated, async (req, res, next) => {
   try {
-    res.status(200).json(req.payload); 
+    const user = await User.findById(req.payload._id)
+    res.status(200).json(user); 
   } catch (err) {
     console.error("Error in /auth/verify:", err);
     res.status(500).json({ message: "Internal Server Error" });

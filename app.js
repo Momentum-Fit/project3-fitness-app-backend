@@ -16,17 +16,16 @@ const Plan = require("./models/Plans.model");
 
 const app = express();
 const FRONTEND_URL = process.env.ORIGIN || "http://localhost:3000";
-const TOKEN_SECRET = process.env.TOKEN_SECRET;
 
-mongoose
-  .connect("mongodb://127.0.0.1:27017/momentum-fit")
-  .then((x) =>
-    console.log(`connected to Mongo! Database name:"${x.connections[0].name}"`)
-  )
-  .catch((err) => console.error("error connecting to Mongo", err));
+// mongoose
+//   .connect("mongodb://127.0.0.1:27017/momentum-fit")
+//   .then((x) =>
+//     console.log(`connected to Mongo! Database name:"${x.connections[0].name}"`)
+//   )
+//   .catch((err) => console.error("error connecting to Mongo", err));
 
   app.use(cors({
-    origin: [FRONTEND_URL, TOKEN_SECRET], 
+    origin: [FRONTEND_URL], 
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"], 
     credentials: true,
